@@ -17,30 +17,29 @@ public class TCP_Client {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter DL to download, UL to upload, DEL to delete, or RE to rename");
         String input = scanner.nextLine();
-        String inputToSend = "";
+        String inputToSend = input + " ";
         if (input.equals("DL")){
             System.out.println("Enter file name with extension that you want to delete");
-            inputToSend = scanner.nextLine();
+            inputToSend += scanner.nextLine();
         }
         if (input.equals("UL")){
             System.out.println("Enter file name with extension that you want to upload");
-            inputToSend = scanner.nextLine();
+            inputToSend += scanner.nextLine();
         }
         if (input.equals("DEL")){
             System.out.println("Enter the file name with extension you want to delete");
-            inputToSend = scanner.nextLine();
+            inputToSend += scanner.nextLine();
         }
         if (input.equals("RE")){
             System.out.println("Enter the name of the file you want to rename");
             String originalName = scanner.nextLine();
             System.out.println("Enter the new name of the file");
             String newName = scanner.nextLine();
-            inputToSend = originalName + " " + newName;
+            inputToSend += originalName + " " + newName;
         }
         else {
             System.out.println("That is not a valid input");
         }
-        inputToSend += " " + input;
 
         ByteBuffer buffer = ByteBuffer.wrap(inputToSend.getBytes(StandardCharsets.UTF_8));
         SocketChannel sc = SocketChannel.open();
