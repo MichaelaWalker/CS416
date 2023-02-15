@@ -22,15 +22,15 @@ public class TCP_Client {
             System.out.println("Enter file name with extension that you want to delete");
             inputToSend = "DL " + scanner.nextLine();
         }
-        if (input.equals("UL")){
+        else if (input.equals("UL")){
             System.out.println("Enter file name with extension that you want to upload");
             inputToSend = "UL " + scanner.nextLine();
         }
-        if (input.equals("DE")){
+        else if (input.equals("DE")){
             System.out.println("Enter the file name with extension you want to delete");
             inputToSend = "DE " + scanner.nextLine();
         }
-        if (input.equals("RE")){
+        else if (input.equals("RE")){
             System.out.println("Enter the name of the file you want to rename");
             String originalName = scanner.nextLine();
             System.out.println("Enter the new name of the file");
