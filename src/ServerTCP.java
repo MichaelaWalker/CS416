@@ -6,6 +6,7 @@ import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.file.Files;
 import java.util.Arrays;
 
 public class ServerTCP {
@@ -21,6 +22,7 @@ public class ServerTCP {
 
         listenChannel.bind(new InetSocketAddress(port));
 
+
         while(true){
             SocketChannel serveChannel =
                     listenChannel.accept();
@@ -30,8 +32,11 @@ public class ServerTCP {
             buffer.flip();
             byte[] bytes = buffer.array();
             String message = new String(bytes);
-            File[] fileList = File.listRoots();
-            System.out.println(message);
+
+            if (message.contains("DE")){
+                String newMessage = message.replace("DE", "");
+                System.out.println(newMessage);
+            }
             }
 
 //            buffer.rewind();
