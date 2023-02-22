@@ -46,6 +46,19 @@ public class ServerTCP {
                     replyMessage = "Failed";
                 }
             }
+
+            if (message.contains("RE")){
+                String newMessage = message.replace("DE", "").replace("\0", "").replace(" ", "");
+                File originalName = new File("src/" + newMessage);
+                File newName = new File("src/" + newMessage);
+                if (originalName.renameTo(newName)){
+                    System.out.println("File is renamed");
+                }
+                else{
+                    System.out.println("File cannot be renamed");
+                }
+            }
+
             ByteBuffer replyBuffer = ByteBuffer.wrap(replyMessage.getBytes(StandardCharsets.UTF_8));
             replyBuffer.rewind();
             serveChannel.write(replyBuffer);
