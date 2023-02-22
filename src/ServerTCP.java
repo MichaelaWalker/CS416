@@ -35,10 +35,11 @@ public class ServerTCP {
             byte[] bytes = buffer.array();
             String message = new String(bytes);
             if (message.contains("DE")){
-                String newMessage = message.replace("DE", "").replace("\0", "");
-                if (Files.exists(Path.of(newMessage))){
-                    System.out.println(newMessage);
+                String newMessage = message.replace("DE", "").replace("\0", "").replace(" ", "");
+                if (Files.exists(Path.of("src/" + newMessage))){
+                    Files.delete(Path.of("src/" + newMessage));
                 }
+                System.out.println("doesn't work");
             }
         }
 
