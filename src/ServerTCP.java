@@ -7,6 +7,7 @@ import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.Arrays;
@@ -34,19 +35,22 @@ public class ServerTCP {
             buffer.flip();
             byte[] bytes = buffer.array();
             String message = new String(bytes);
+            String replyMessage = "not working";
             if (message.contains("DE")){
                 String newMessage = message.replace("DE", "").replace("\0", "").replace(" ", "");
                 if (Files.exists(Path.of("src/" + newMessage))){
                     Files.delete(Path.of("src/" + newMessage));
+                    replyMessage = "Done";
                 }
-                System.out.println("doesn't work");
+                else {
+                    replyMessage = "Failed";
+                }
             }
+            ByteBuffer replyBuffer = ByteBuffer.wrap(replyMessage.getBytes(StandardCharsets.UTF_8));
+            replyBuffer.rewind();
+            serveChannel.write(replyBuffer);
+            serveChannel.shutdownOutput();
         }
-
-//            buffer.rewind();
-//            serveChannel.write(buffer);
-//            serveChannel.close();
-        //}
     }
 }
 

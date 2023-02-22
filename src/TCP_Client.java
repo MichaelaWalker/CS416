@@ -48,12 +48,16 @@ public class TCP_Client {
         sc.write(buffer);
         sc.shutdownOutput();
 //reading response
-        buffer.clear();
-        sc.read(buffer);
+        ByteBuffer replyBuffer = ByteBuffer.allocate(1040);
+        replyBuffer.clear();
+        replyBuffer.rewind();
+        sc.read(replyBuffer);
         sc.close();
-        buffer.flip();
-        byte[] bytes = buffer.array();
-        System.out.println(new String(bytes));
+        replyBuffer.flip();
+        byte[] bytes = replyBuffer.array();
+        String replyMessage = new String(bytes);
+        replyMessage = replyMessage.replace("\0", "");
+        System.out.println(replyMessage);
 
     }
 }
