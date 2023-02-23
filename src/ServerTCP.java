@@ -1,16 +1,11 @@
-
-
-import java.io.File;
 import java.io.IOException;
 import java.net.InetSocketAddress;
-import java.nio.Buffer;
 import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.util.Arrays;
 
 public class ServerTCP {
     public static void main(String[] args) throws IOException {
@@ -48,14 +43,17 @@ public class ServerTCP {
             }
 
             if (message.contains("RE")){
-                String newMessage = message.replace("DE", "").replace("\0", "").replace(" ", "");
-                File originalName = new File("src/" + newMessage);
-                File newName = new File("src/" + newMessage);
-                if (originalName.renameTo(newName)){
-                    System.out.println("File is renamed");
+                String newMessage = message.replace("RE", "").replace("\0", "");
+                int middle = newMessage.indexOf(" ");
+                String newName = newMessage.substring(middle).replace(" ", "");
+                String oldName = newMessage.replace(newName, "").replace(" ", "");
+                if (Files.exists(Path.of("src/" + oldName))){
+                    Files.copy(Path.of("src/" + oldName), Path.of("src/" + newName));
+                    Files.delete(Path.of("src/" + oldName));
+                    replyMessage = "Done";
                 }
-                else{
-                    System.out.println("File cannot be renamed");
+                else {
+                    replyMessage = "Failed";
                 }
             }
 
