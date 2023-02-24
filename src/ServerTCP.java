@@ -1,5 +1,6 @@
 import java.awt.desktop.FilesEvent;
 import java.io.File;
+import java.io.FileFilter;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
@@ -62,14 +63,27 @@ public class ServerTCP {
             }
 
             if (message.contains("LI")){
-                File[] fileList = File.listRoots();
-                StringBuilder fileNameList = new StringBuilder();
-                for (File file: fileList
-                     ) {
-                    String fileName = file.toString();
-                    fileNameList.append(fileName).append("\n");
+                File directoryPath = new File("src/");
+                FileFilter fileFilter = new FileFilter() {
+                    public boolean accept(File pathname) {
+                        if (pathname.isFile()) {
+                            return true;
+                        } else {
+                            return false;
+                        }
+                    }
+                };
+                File[] list = directoryPath.listFiles(fileFilter);
+                ArrayList<String> lists = new ArrayList<>();
+                for (File file : list){
+                    if (!file.isDirectory()) {
+                        lists.add(file.getName() + "\n");
+                        System.out.println(file.getName());
+                    }
                 }
-                replyMessage = String.valueOf(fileNameList);
+                for (String s : lists) {
+                    replyMessage += s;
+                }
             }
 
             if (message.contains("DL")){
