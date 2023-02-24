@@ -1,3 +1,6 @@
+import java.awt.desktop.FilesEvent;
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
@@ -6,6 +9,8 @@ import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
+import java.util.ArrayList;
+import java.util.stream.Stream;
 
 public class ServerTCP {
     public static void main(String[] args) throws IOException {
@@ -14,12 +19,9 @@ public class ServerTCP {
             return;
         }
         int port = Integer.parseInt(args[0]);
-
         ServerSocketChannel listenChannel =
                 ServerSocketChannel.open();
-
         listenChannel.bind(new InetSocketAddress(port));
-
 
         while(true){
             SocketChannel serveChannel =
@@ -33,8 +35,9 @@ public class ServerTCP {
             String replyMessage = "not working";
             if (message.contains("DE")){
                 String newMessage = message.replace("DE", "").replace("\0", "").replace(" ", "");
-                if (Files.exists(Path.of("src/" + newMessage))){
-                    Files.delete(Path.of("src/" + newMessage));
+                Path filePathToDelete = Path.of("src/" + newMessage);
+                if (Files.exists(filePathToDelete)){
+                    Files.delete(filePathToDelete);
                     replyMessage = "Done";
                 }
                 else {
@@ -47,13 +50,33 @@ public class ServerTCP {
                 int middle = newMessage.indexOf(" ");
                 String newName = newMessage.substring(middle).replace(" ", "");
                 String oldName = newMessage.replace(newName, "").replace(" ", "");
-                if (Files.exists(Path.of("src/" + oldName))){
-                    Files.copy(Path.of("src/" + oldName), Path.of("src/" + newName));
-                    Files.delete(Path.of("src/" + oldName));
+                Path originalFile = Path.of("src/" + oldName);
+                if (Files.exists(originalFile)){
+                    Files.copy(originalFile, Path.of("src/" + newName));
+                    Files.delete(originalFile);
                     replyMessage = "Done";
                 }
                 else {
                     replyMessage = "Failed";
+                }
+            }
+
+            if (message.contains("LI")){
+                File[] fileList = File.listRoots();
+                StringBuilder fileNameList = new StringBuilder();
+                for (File file: fileList
+                     ) {
+                    String fileName = file.toString();
+                    fileNameList.append(fileName).append("\n");
+                }
+                replyMessage = String.valueOf(fileNameList);
+            }
+
+            if (message.contains("DL")){
+                String fileName = message.replace("DL", "").replace(" ", "").replace("\0", "");
+                if (Files.exists(Path.of("src/" + fileName))){
+                    ArrayList<String> file = (ArrayList<String>) Files.readAllLines(Path.of("src/" + fileName));
+                    replyMessage = String.valueOf(file);
                 }
             }
 

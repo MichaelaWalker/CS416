@@ -15,7 +15,7 @@ public class TCP_Client {
         String serverIP = args[0];
         int serverPort = Integer.parseInt(args[1]);
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Enter DL to download, UL to upload, DE to delete, or RE to rename");
+        System.out.println("Enter DL to download, UL to upload, DE to delete, RE to rename, or LI to list all files");
         String input = scanner.nextLine();
         String inputToSend = "";
         switch (input) {
@@ -38,6 +38,9 @@ public class TCP_Client {
                 String newName = scanner.nextLine();
                 inputToSend = "RE" + originalName + " " + newName;
             }
+            case "LI" -> {
+                inputToSend = "LI";
+            }
             default -> System.out.println("That is not a valid input");
         }
 
@@ -48,6 +51,7 @@ public class TCP_Client {
         sc.write(buffer);
         sc.shutdownOutput();
 //reading response
+
         ByteBuffer replyBuffer = ByteBuffer.allocate(1040);
         replyBuffer.clear();
         replyBuffer.rewind();
@@ -55,9 +59,13 @@ public class TCP_Client {
         sc.close();
         replyBuffer.flip();
         byte[] bytes = replyBuffer.array();
-        String replyMessage = new String(bytes);
-        replyMessage = replyMessage.replace("\0", "");
-        System.out.println(replyMessage);
+        if (input.equals("DL")){
 
+        }
+        else {
+            String replyMessage = new String(bytes);
+            replyMessage = replyMessage.replace("\0", "");
+            System.out.println(replyMessage);
+        }
     }
 }
