@@ -1,8 +1,12 @@
+import java.io.BufferedReader;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.Scanner;
 
 public class TCP_Client {
@@ -51,18 +55,35 @@ public class TCP_Client {
         sc.write(buffer);
         sc.shutdownOutput();
 //reading response
-
         ByteBuffer replyBuffer = ByteBuffer.allocate(1040);
-        replyBuffer.clear();
-        replyBuffer.rewind();
-        sc.read(replyBuffer);
-        sc.close();
-        replyBuffer.flip();
-        byte[] bytes = replyBuffer.array();
         if (input.equals("DL")){
-
+            String fileName = inputToSend.replace("DL", "").replace(" ", "");
+            Path of = Path.of(fileName);
+            Files.createFile(of);
+            //BufferedReader reader = new BufferedReader(new FileReader(fileName));
+            if (sc.read(replyBuffer) != -1){
+            try{
+                BufferedReader in = new BufferedReader(new FileReader(sc.toString()));
+                String contentLine = in.readLine();
+                while (contentLine != null){
+                    contentLine = in.readLine();
+                    if (contentLine != null){
+                        Files.write(of, contentLine.getBytes());
+                        }
+                    }
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
+                }
+            }
         }
         else {
+            replyBuffer.clear();
+            replyBuffer.rewind();
+            sc.read(replyBuffer);
+            sc.close();
+            replyBuffer.flip();
+            byte[] bytes = replyBuffer.array();
+
             String replyMessage = new String(bytes);
             replyMessage = replyMessage.replace("\0", "");
             System.out.println(replyMessage);
