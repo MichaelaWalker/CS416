@@ -1,8 +1,5 @@
 import java.awt.desktop.FilesEvent;
-import java.io.File;
-import java.io.FileFilter;
-import java.io.FileOutputStream;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.ServerSocketChannel;
@@ -33,7 +30,9 @@ public class ServerTCP {
             buffer.flip();
             byte[] bytes = buffer.array();
             String message = new String(bytes);
-            String replyMessage = "not working";
+            String replyMessage = "";
+
+
             if (message.contains("DE")){
                 String newMessage = message.replace("DE", "").replace("\0", "").replace(" ", "");
                 Path filePathToDelete = Path.of("src/" + newMessage);
@@ -45,6 +44,7 @@ public class ServerTCP {
                     replyMessage = "Failed";
                 }
             }
+
 
             if (message.contains("RE")){
                 String newMessage = message.replace("RE", "").replace("\0", "");
@@ -88,11 +88,30 @@ public class ServerTCP {
 
             if (message.contains("DL")){
                 String fileName = message.replace("DL", "").replace(" ", "").replace("\0", "");
-                if (Files.exists(Path.of("src/" + fileName))){
-                    ArrayList<String> file = (ArrayList<String>) Files.readAllLines(Path.of("src/" + fileName));
-                    replyMessage = String.valueOf(file);
+                String filePath = "src/" + fileName;
+                try{
+                    BufferedReader in = new BufferedReader(new FileReader(filePath));
+                    String contentLine = in.readLine();
+                    serveChannel.write(ByteBuffer.wrap(contentLine.getBytes()));
+                    while (contentLine != null){
+                        contentLine = in.readLine();
+                        if (contentLine != null){
+                            serveChannel.write(ByteBuffer.wrap(contentLine.getBytes()));
+                        }
+                    }
+                    in.close();
+                    serveChannel.close();
+                } catch (IOException e) {
+                    throw new RuntimeException(e);
                 }
             }
+
+
+            // if (message.contains("UL")){
+            //    String fileName = message.replace("UL", "").replace(" ", "").replace("\0", "");
+
+            //}
+
 
             ByteBuffer replyBuffer = ByteBuffer.wrap(replyMessage.getBytes(StandardCharsets.UTF_8));
             replyBuffer.rewind();
