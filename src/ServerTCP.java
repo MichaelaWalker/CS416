@@ -99,8 +99,6 @@ public class ServerTCP {
                             serveChannel.write(ByteBuffer.wrap(contentLine.getBytes()));
                         }
                     }
-                    in.close();
-                    serveChannel.close();
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
