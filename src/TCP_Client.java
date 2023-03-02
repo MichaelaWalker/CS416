@@ -1,6 +1,4 @@
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.net.InetSocketAddress;
 import java.nio.ByteBuffer;
 import java.nio.channels.SocketChannel;
@@ -56,37 +54,27 @@ public class TCP_Client {
         sc.shutdownOutput();
 //reading response
         ByteBuffer replyBuffer = ByteBuffer.allocate(1040);
-        if (input.equals("DL")){
+
+        replyBuffer.clear();
+        replyBuffer.rewind();
+        sc.read(replyBuffer);
+        sc.close();
+        replyBuffer.flip();
+        byte[] bytes = replyBuffer.array();
+        if (input.equals("DL")) {
             String fileName = inputToSend.replace("DL", "").replace(" ", "");
-            Path of = Path.of(fileName);
-            Files.createFile(of);
-            //BufferedReader reader = new BufferedReader(new FileReader(fileName));
-            if (sc.read(replyBuffer) != -1){
-            try{
-                BufferedReader in = new BufferedReader(new FileReader(sc.toString()));
-                String contentLine = in.readLine();
-                while (contentLine != null){
-                    contentLine = in.readLine();
-                    if (contentLine != null){
-                        Files.write(of, contentLine.getBytes());
-                        }
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-            }
+            File file = new File(System.getProperty("user.dir") + fileName);
+            writeByteArrayToFile(bytes, file);
         }
         else {
-            replyBuffer.clear();
-            replyBuffer.rewind();
-            sc.read(replyBuffer);
-            sc.close();
-            replyBuffer.flip();
-            byte[] bytes = replyBuffer.array();
-
             String replyMessage = new String(bytes);
             replyMessage = replyMessage.replace("\0", "");
             System.out.println(replyMessage);
         }
+    }
+    public static void writeByteArrayToFile(byte[] bytes, File file) throws IOException {
+        FileOutputStream outputStream = new FileOutputStream(file);
+        outputStream.write(bytes);
+        outputStream.close();
     }
 }

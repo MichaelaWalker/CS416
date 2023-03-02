@@ -88,20 +88,9 @@ public class ServerTCP {
 
             if (message.contains("DL")){
                 String fileName = message.replace("DL", "").replace(" ", "").replace("\0", "");
-                String filePath = "src/" + fileName;
-                try{
-                    BufferedReader in = new BufferedReader(new FileReader(filePath));
-                    String contentLine = in.readLine();
-                    serveChannel.write(ByteBuffer.wrap(contentLine.getBytes()));
-                    while (contentLine != null){
-                        contentLine = in.readLine();
-                        if (contentLine != null){
-                            serveChannel.write(ByteBuffer.wrap(contentLine.getBytes()));
-                        }
-                    }
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
+                String filePath = "/src/" + fileName;
+                File file = new File(System.getProperty("user.dir") + filePath);
+                serveChannel.write(ByteBuffer.wrap(fileToByteArray(file)));
             }
 
 
@@ -116,6 +105,19 @@ public class ServerTCP {
             serveChannel.write(replyBuffer);
             serveChannel.shutdownOutput();
         }
+    }
+
+    public static byte[] fileToByteArray(File file) throws IOException {
+        FileInputStream inputStream = new FileInputStream(file);
+        byte[] bytes = new byte[(int) file.length()];
+        inputStream.read(bytes);
+        inputStream.close();
+        return bytes;
+    }
+    public static void writeByteArrayToFile(byte[] bytes, File file) throws IOException {
+        FileOutputStream outputStream = new FileOutputStream(file);
+        outputStream.write(bytes);
+        outputStream.close();
     }
 }
 
