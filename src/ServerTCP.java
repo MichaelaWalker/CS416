@@ -29,6 +29,7 @@ public class ServerTCP {
             serveChannel.read(buffer);
             buffer.flip();
             byte[] bytes = buffer.array();
+            buffer.clear();
             String message = new String(bytes);
             String replyMessage = "";
 
@@ -94,10 +95,20 @@ public class ServerTCP {
             }
 
 
-            // if (message.contains("UL")){
-            //    String fileName = message.replace("UL", "").replace(" ", "").replace("\0", "");
-
-            //}
+             if (message.contains("UL")){
+                 System.out.println(message);
+                 String fileName = message.replace("UL", "").replace(" ", "").replace("\0", "");
+                 int middle = fileName.lastIndexOf("/");
+                 String newFileName = fileName.substring(middle);
+                 String remove = fileName.replace(newFileName, "");
+                 fileName = fileName.replace(remove, "");
+                 System.out.println(fileName);
+                 String filePath = "/src/" + newFileName;
+                 File file = new File(System.getProperty("user.dir") + filePath);
+                 serveChannel.read(buffer);
+                 byte[] fileContents = buffer.array();
+                 writeByteArrayToFile(fileContents, file);
+            }
 
 
             ByteBuffer replyBuffer = ByteBuffer.wrap(replyMessage.getBytes(StandardCharsets.UTF_8));

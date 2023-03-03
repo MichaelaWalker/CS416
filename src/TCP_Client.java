@@ -16,6 +16,8 @@ public class TCP_Client {
 
         String serverIP = args[0];
         int serverPort = Integer.parseInt(args[1]);
+        SocketChannel sc = SocketChannel.open();
+        sc.connect(new InetSocketAddress(serverIP, serverPort));
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter DL to download, UL to upload, DE to delete, RE to rename, or LI to list all files");
         String input = scanner.nextLine();
@@ -27,7 +29,16 @@ public class TCP_Client {
             }
             case "UL" -> {
                 System.out.println("Enter file name with extension that you want to upload");
-                inputToSend = "UL " + scanner.nextLine();
+                String fileName = scanner.nextLine();
+                Path files = Path.of(fileName);
+                //Path actualPath = files.toAbsolutePath();
+                inputToSend = "UL " + fileName;
+                ByteBuffer buffer = ByteBuffer.wrap(inputToSend.getBytes(StandardCharsets.UTF_8));
+                buffer.rewind();
+                sc.write(buffer);
+                File file = new File(files.toUri());
+                sc.write(ByteBuffer.wrap(fileToByteArray(file)));
+
             }
             case "DE" -> {
                 System.out.println("Enter the file name with extension you want to delete");
@@ -47,8 +58,6 @@ public class TCP_Client {
         }
 
         ByteBuffer buffer = ByteBuffer.wrap(inputToSend.getBytes(StandardCharsets.UTF_8));
-        SocketChannel sc = SocketChannel.open();
-        sc.connect(new InetSocketAddress(serverIP, serverPort));
         buffer.rewind();
         sc.write(buffer);
         sc.shutdownOutput();
@@ -76,5 +85,12 @@ public class TCP_Client {
         FileOutputStream outputStream = new FileOutputStream(file);
         outputStream.write(bytes);
         outputStream.close();
+    }
+    public static byte[] fileToByteArray(File file) throws IOException {
+        FileInputStream inputStream = new FileInputStream(file);
+        byte[] bytes = new byte[(int) file.length()];
+        inputStream.read(bytes);
+        inputStream.close();
+        return bytes;
     }
 }
