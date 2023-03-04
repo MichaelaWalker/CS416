@@ -26,44 +26,57 @@ public class TCP_Client {
             case "DL" -> {
                 System.out.println("Enter file name with extension that you want to download");
                 inputToSend = "DL " + scanner.nextLine();
+                ByteBuffer buffer = ByteBuffer.wrap(inputToSend.getBytes(StandardCharsets.UTF_8));
+                buffer.rewind();
+                sc.write(buffer);
+                sc.shutdownOutput();
             }
+
             case "UL" -> {
-                System.out.println("Enter file name with extension that you want to upload");
+                System.out.println("Enter file name directory that you want to upload");
                 String fileName = scanner.nextLine();
                 Path files = Path.of(fileName);
-                //Path actualPath = files.toAbsolutePath();
                 inputToSend = "UL " + fileName;
                 ByteBuffer buffer = ByteBuffer.wrap(inputToSend.getBytes(StandardCharsets.UTF_8));
                 buffer.rewind();
                 sc.write(buffer);
                 File file = new File(files.toUri());
                 sc.write(ByteBuffer.wrap(fileToByteArray(file)));
-
             }
+
             case "DE" -> {
                 System.out.println("Enter the file name with extension you want to delete");
                 inputToSend = "DE " + scanner.nextLine();
+                ByteBuffer buffer = ByteBuffer.wrap(inputToSend.getBytes(StandardCharsets.UTF_8));
+                buffer.rewind();
+                sc.write(buffer);
+                sc.shutdownOutput();
             }
+
             case "RE" -> {
                 System.out.println("Enter the name of the file with extension you want to rename");
                 String originalName = scanner.nextLine();
                 System.out.println("Enter the new name of the file");
                 String newName = scanner.nextLine();
                 inputToSend = "RE" + originalName + " " + newName;
+                ByteBuffer buffer = ByteBuffer.wrap(inputToSend.getBytes(StandardCharsets.UTF_8));
+                buffer.rewind();
+                sc.write(buffer);
+                sc.shutdownOutput();
             }
+
             case "LI" -> {
                 inputToSend = "LI";
+                ByteBuffer buffer = ByteBuffer.wrap(inputToSend.getBytes(StandardCharsets.UTF_8));
+                buffer.rewind();
+                sc.write(buffer);
+                sc.shutdownOutput();
             }
+
             default -> System.out.println("That is not a valid input");
         }
-
-        ByteBuffer buffer = ByteBuffer.wrap(inputToSend.getBytes(StandardCharsets.UTF_8));
-        buffer.rewind();
-        sc.write(buffer);
-        sc.shutdownOutput();
 //reading response
         ByteBuffer replyBuffer = ByteBuffer.allocate(1040);
-
         replyBuffer.clear();
         replyBuffer.rewind();
         sc.read(replyBuffer);

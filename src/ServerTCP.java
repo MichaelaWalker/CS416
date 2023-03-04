@@ -79,7 +79,6 @@ public class ServerTCP {
                 for (File file : list){
                     if (!file.isDirectory()) {
                         lists.add(file.getName() + "\n");
-                        System.out.println(file.getName());
                     }
                 }
                 for (String s : lists) {
@@ -92,22 +91,22 @@ public class ServerTCP {
                 String filePath = "/src/" + fileName;
                 File file = new File(System.getProperty("user.dir") + filePath);
                 serveChannel.write(ByteBuffer.wrap(fileToByteArray(file)));
+                replyMessage = "Done";
             }
 
 
              if (message.contains("UL")){
-                 System.out.println(message);
                  String fileName = message.replace("UL", "").replace(" ", "").replace("\0", "");
                  int middle = fileName.lastIndexOf("/");
                  String newFileName = fileName.substring(middle);
                  String remove = fileName.replace(newFileName, "");
                  fileName = fileName.replace(remove, "");
-                 System.out.println(fileName);
-                 String filePath = "/src/" + newFileName;
+                 String filePath = "/src" + fileName;
                  File file = new File(System.getProperty("user.dir") + filePath);
                  serveChannel.read(buffer);
                  byte[] fileContents = buffer.array();
                  writeByteArrayToFile(fileContents, file);
+                 replyMessage = "Done";
             }
 
 
